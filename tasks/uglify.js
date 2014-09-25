@@ -53,7 +53,7 @@ module.exports = function(grunt) {
     // Process banner.
     var banner = normalizeLf(options.banner);
     var footer = normalizeLf(options.footer);
-    var mapNameGenerator, mapInNameGenerator;
+    var mapGenerator, mapNameGenerator, mapInNameGenerator;
     var createdFiles = 0;
     var createdMaps = 0;
 
@@ -117,6 +117,20 @@ module.exports = function(grunt) {
           options.sourceMapIn = mapInNameGenerator(src[0]);
         } catch (e) {
           var err = new Error('SourceMapInName failed.');
+          err.origError = e;
+          grunt.fail.warn(err);
+        }
+      }
+
+      if (typeof options.sourceMap === "function") {
+        mapGenerator = options.sourceMap;
+      }
+
+      if (mapGenerator) {
+        try {
+          options.sourceMap = mapGenerator(src[0]);
+        } catch (e) {
+          var err = new Error('SourceMap failed.');
           err.origError = e;
           grunt.fail.warn(err);
         }
